@@ -1,0 +1,46 @@
+# This project's own CI.
+#
+# Two jobs on purpose. `unit` proves the suite is green on a machine with no
+# browser at all, which is the contract for anyone who only touches the pure
+# logic and for the verify subcommand. `browser` installs Chromium and runs the
+# same suite, where the crawl tests stop skipping and actually walk the fixture
+# site. If only the second job were run, the skip path would rot unnoticed.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    name: tests without a browser (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18.17', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node --test
+      - name: The help text must be readable without a browser
+        run: node bin/deep-smoke.js --help
+
+  browser:
+    name: tests with a browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright as a consumer would
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - run: node --test

@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Evidence written by a local run. Remove this line if you want evidence in review.
+.deep-smoke/
+
+# Saved browser sessions. These are live credentials: never commit them.
+.auth/
+*storage-state*.json
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+
+# Build and packaging output
+dist/
+coverage/
+*.tgz
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,61 @@
+{
+  "name": "deep-smoke",
+  "version": "0.1.0",
+  "description": "Levelled smoke-testing crawler for web apps: walk every reachable route, as every persona, with and without authentication, and assert the page actually rendered something real.",
+  "keywords": [
+    "smoke-test",
+    "smoke-testing",
+    "crawler",
+    "playwright",
+    "end-to-end",
+    "testing",
+    "ci",
+    "route-coverage",
+    "regression",
+    "error-boundary",
+    "frontend",
+    "qa"
+  ],
+  "homepage": "https://github.com/danilolapegna/deep-smoke#readme",
+  "bugs": {
+    "url": "https://github.com/danilolapegna/deep-smoke/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danilolapegna/deep-smoke.git"
+  },
+  "license": "MIT",
+  "author": "Danilo Lapegna",
+  "type": "module",
+  "bin": {
+    "deep-smoke": "bin/deep-smoke.js"
+  },
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "examples",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "peerDependencies": {
+    "playwright": ">=1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "playwright": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "test": "node --test",
+    "smoke:self": "node bin/deep-smoke.js --help"
+  }
+}

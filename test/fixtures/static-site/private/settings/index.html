@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Settings</title>
+    <link rel="icon" href="data:," />
+    <script>
+      if (!window.localStorage.getItem('deep-smoke-session')) {
+        window.location.replace('/login');
+      }
+    </script>
+  </head>
+  <body>
+    <main id="app">
+      <h1>Settings</h1>
+      <p>A second protected route, so a signed-in crawl has somewhere to go.</p>
+    </main>
+  </body>
+</html>

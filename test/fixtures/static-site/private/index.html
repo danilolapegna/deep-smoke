@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Private area</title>
+    <link rel="icon" href="data:," />
+    <script>
+      // A protected route: without a session, bounce to the sign-in page.
+      if (!window.localStorage.getItem('deep-smoke-session')) {
+        window.location.replace('/login');
+      }
+    </script>
+  </head>
+  <body>
+    <main id="app">
+      <h1>Private area</h1>
+      <p>Only a signed-in visitor should ever read this sentence.</p>
+      <p><a href="/private/settings">Settings</a></p>
+    </main>
+  </body>
+</html>

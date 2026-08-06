@@ -1,0 +1,56 @@
+# Ready-to-copy workflow: crawl a production build on every pull request.
+#
+# Copy to .github/workflows/smoke.yml and adjust the build and preview commands.
+#
+# Two things are worth keeping if you change anything else. fetch-depth: 0, because
+# the freshness rule compares commits and a shallow clone cannot be reasoned about,
+# so deep-smoke fails closed on one. And the evidence upload, because a failed run
+# is much easier to read from the JSON than from a log.
+
+name: smoke
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  deep-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Only the browser that deep-smoke uses, and only when the cache misses.
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run build
+
+      - name: Start the production build
+        run: |
+          npm run preview -- --port 4173 &
+          npx wait-on http://localhost:4173 --timeout 60000
+
+      - name: Crawl every route, as every persona
+        run: npx deep-smoke --level=3 --url=http://localhost:4173
+        env:
+          SMOKE_MEMBER_EMAIL: ${{ secrets.SMOKE_MEMBER_EMAIL }}
+          SMOKE_MEMBER_PASSWORD: ${{ secrets.SMOKE_MEMBER_PASSWORD }}
+
+      - name: Keep the evidence, whatever the outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deep-smoke-evidence
+          path: .deep-smoke/
+          if-no-files-found: warn

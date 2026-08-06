@@ -1,0 +1,55 @@
+{
+  "_": "Every kind of user who can reach a page. Four strategies are shown; you will normally use one of them for every persona in a project.",
+
+  "personas": [
+    {
+      "id": "anonymous",
+      "label": "Signed-out visitor",
+      "auth": { "strategy": "none" }
+    },
+
+    {
+      "id": "member",
+      "label": "Signed-in member",
+      "seeds": ["/app", "/app/settings"],
+      "_seeds": "Entry points only this persona can reach. They are crawled in addition to the routes in the config.",
+      "auth": {
+        "strategy": "form",
+        "loginPath": "/sign-in",
+        "usernameSelector": "input[name='email']",
+        "passwordSelector": "input[name='password']",
+        "submitSelector": "button[type='submit']",
+        "username": "env:SMOKE_MEMBER_EMAIL",
+        "password": "env:SMOKE_MEMBER_PASSWORD",
+        "_credentials": "Any string field may be written as env:VARIABLE_NAME. Only the variable name is ever printed, so a failing run never leaks a password into a build log.",
+        "waitForSelector": "[data-user-menu]",
+        "_waitForSelector": "Something that only exists once signed in. Without it, deep-smoke waits for the URL to leave loginPath, which works but is less precise.",
+        "timeoutMs": 20000
+      }
+    },
+
+    {
+      "id": "admin",
+      "label": "Administrator",
+      "seeds": ["/admin"],
+      "auth": {
+        "strategy": "storageState",
+        "path": "./.auth/admin.json",
+        "_path": "A Playwright storage state file: cookies plus local storage, saved from a browser that is already signed in. Create one with `npx playwright codegen --save-storage=.auth/admin.json <your-url>`, and keep it out of version control."
+      }
+    },
+
+    {
+      "id": "partner",
+      "label": "External partner, single sign-on",
+      "seeds": ["/partners"],
+      "auth": {
+        "strategy": "module",
+        "path": "./deep-smoke-auth.mjs",
+        "export": "default",
+        "options": { "tenant": "acme" },
+        "_module": "The escape hatch. Your own function receives the browser context and a page, and does whatever your sign-in needs: a token exchange, a one-time code, a redirect dance through an identity provider. See auth-module.mjs in this folder."
+      }
+    }
+  ]
+}

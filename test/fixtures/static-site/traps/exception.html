@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Exception</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <main id="app">
+      <h1>Exception</h1>
+      <p>This page renders, and then throws.</p>
+    </main>
+    <script>
+      setTimeout(function () {
+        throw new Error('deliberate failure from the exception fixture');
+      }, 0);
+    </script>
+  </body>
+</html>

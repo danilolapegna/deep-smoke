@@ -1,0 +1,81 @@
+{
+  "_": "Copy to the root of your project as deep-smoke.config.json and delete what you do not need. Every key is optional. Keys starting with an underscore are ignored, so they can be used for comments.",
+
+  "baseUrl": "http://localhost:4173",
+  "_baseUrl": "Where the app is running. Override per run with --url.",
+
+  "routes": ["/", "/pricing", "/blog", "/sign-in", "/app", "/app/settings"],
+  "_routes": "Seed routes. Link discovery expands this at levels 2 and 3, but anything reachable only through a button, a form or a redirect has to be listed here.",
+
+  "ignoreRoutes": ["/api/*", "/healthz", "/sign-out"],
+  "_ignoreRoutes": "Never visit these. A trailing star matches a subtree. Sign-out belongs here: crawling it would end the session halfway through the run.",
+
+  "personas": "./deep-smoke.personas.json",
+  "_personas": "A path, or an inline array. Omit it entirely to crawl as a single anonymous visitor.",
+
+  "protectedPrefixes": ["/app", "/admin"],
+  "_protectedPrefixes": "Level 3 rule: an anonymous visitor must be redirected away from these.",
+
+  "publicRoutes": ["/", "/pricing", "/blog"],
+  "_publicRoutes": "Level 3 rule: a signed-in visitor must not be redirected away from these.",
+
+  "maxRoutes": 100,
+  "budgetMs": 180000,
+  "_budgets": "Per persona. Level 3 rejects evidence from a run that hit either limit, because a truncated crawl is not a crawl of the whole tree.",
+
+  "navigationTimeoutMs": 20000,
+  "routeTimeoutMs": 45000,
+  "settleMs": 250,
+  "readySelector": null,
+  "_readySelector": "A selector that only exists once your app has finished its first render. Worth setting on a slow app: it makes every visit both faster and more reliable than a fixed delay.",
+
+  "retryFailedRoutes": true,
+  "_retryFailedRoutes": "Visit a failing route once more on a fresh page. Only a failure that reproduces is reported.",
+
+  "checks": {
+    "pageExceptions": true,
+    "errorBoundaries": true,
+    "blankScreen": true,
+    "httpStatus": true,
+    "brokenAssets": true,
+    "consoleErrors": true,
+    "authRedirects": true
+  },
+
+  "errorBoundary": {
+    "selectors": ["[data-error-boundary]", ".error-fallback"],
+    "texts": ["something went wrong", "unexpected error"]
+  },
+  "_errorBoundary": "The selector is the reliable signal. Add data-error-boundary to your own fallback component and the text matching stops mattering.",
+
+  "console": {
+    "severity": "error",
+    "ignorePatterns": ["^ResizeObserver loop", "third-party-widget"],
+    "_failPatterns": "Leave failPatterns unset to use the built-in list of messages that mean a page is broken. Set it to [] to fail on every console error at the chosen severity, which is strict but honest on a codebase that has no console noise."
+  },
+
+  "http": {
+    "failFrom": 400,
+    "thirdPartyIsFatal": false,
+    "ignoreUrlPatterns": ["/favicon\\.ico(\\?|$)", "analytics\\."]
+  },
+
+  "evidence": {
+    "dir": ".deep-smoke",
+    "write": true
+  },
+
+  "freshness": {
+    "behaviourPaths": ["src", "app", "public", "index.html", "package.json", "package-lock.json"],
+    "maxAgeMinutes": 120
+  },
+  "_freshness": "behaviourPaths decides when old evidence stops counting: a change under any of these invalidates it. maxAgeMinutes is only used when the crawl ran outside version control.",
+
+  "browser": {
+    "channel": null,
+    "executablePath": null,
+    "headless": true,
+    "viewport": { "width": 1366, "height": 900 },
+    "launchArgs": []
+  }
+}
