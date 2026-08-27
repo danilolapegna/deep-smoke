@@ -22,20 +22,19 @@ useDefault = true
 # Global allowlist, applied to every rule.
 # Keep regexes and paths anchored and specific; prefer file paths over secret substrings.
 [[allowlists]]
-description = "Test, example, evidence, dependency and build-output paths that are not secrets"
+description = "Example, evidence, dependency and build-output paths that are not secrets"
 paths = [
   '''\.gitleaks\.toml$''',
   '''\.env\.example$''',
   '''\.env\.test$''',
+  # Test files are deliberately NOT excluded: a real secret inside a fixture would
+  # otherwise pass in silence, and that is a classic leak vector. Known placeholder
+  # values are suppressed one at a time, by fingerprint, in .gitleaksignore.
   '''(?:^|/)\.agent-framework/.*''',
   '''(?:^|/)_smoke-evidence/.*''',
   '''(?:^|/)_design-evidence/.*''',
   '''(?:^|/)node_modules/.*''',
   '''(?:^|/)\.git/.*''',
-  '''.*\.test\..*''',
-  '''.*\.spec\..*''',
-  '''(?:^|/)__tests__/.*''',
-  '''(?:^|/)tests/.*''',
   '''(?:^|/)\.vercel/.*''',
   '''(?:^|/)dist/.*''',
   '''(?:^|/)\.output/.*''',
