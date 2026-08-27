@@ -1,0 +1,60 @@
+# gitleaks configuration
+#
+# Extends the built-in default rules (useDefault = true) and adds a small
+# allowlist for paths that are known sources of false positives. Keep it lean:
+# every exclusion is a potential blind spot.
+#
+# Usage:
+#   gitleaks git --staged --verbose --redact       # pre-commit (default)
+#   gitleaks dir . -v                              # full working-tree scan
+#   gitleaks git --log-opts="--all" -v             # full history scan
+#
+# Tuning rule: count the false positives on real runs before changing this file.
+# If there are many, narrow a path or disable the noisy rule; never widen blindly.
+#
+# References: https://github.com/gitleaks/gitleaks#configuration
+
+title = "gitleaks config"
+
+[extend]
+useDefault = true
+
+# Global allowlist, applied to every rule.
+# Keep regexes and paths anchored and specific; prefer file paths over secret substrings.
+[[allowlists]]
+description = "Test, example, evidence, dependency and build-output paths that are not secrets"
+paths = [
+  '''\.gitleaks\.toml$''',
+  '''\.env\.example$''',
+  '''\.env\.test$''',
+  '''(?:^|/)\.agent-framework/.*''',
+  '''(?:^|/)_smoke-evidence/.*''',
+  '''(?:^|/)_design-evidence/.*''',
+  '''(?:^|/)node_modules/.*''',
+  '''(?:^|/)\.git/.*''',
+  '''.*\.test\..*''',
+  '''.*\.spec\..*''',
+  '''(?:^|/)__tests__/.*''',
+  '''(?:^|/)tests/.*''',
+  '''(?:^|/)\.vercel/.*''',
+  '''(?:^|/)dist/.*''',
+  '''(?:^|/)\.output/.*''',
+  '''(?:^|/)sanity/dist/.*''',
+  '''(?:^|/)\.astro/.*''',
+  '''(?:^|/)\.next/.*''',
+  '''(?:^|/)_output/.*''',
+  '''(?:^|/)_evidence/.*''',
+  '''(?:^|/)_eval-evidence/.*''',
+  '''(?:^|/)coverage/.*''',
+  '''.*\.generated\..*''',
+  '''.*\.example$''',
+]
+
+[[allowlists]]
+description = "Example, fake and test placeholder secrets"
+regexTarget = "match"
+regexes = [
+  '''(?i)example''',
+  '''(?i)fake[_-]?key''',
+  '''(?i)test[_-]?key''',
+]
