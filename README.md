@@ -22,7 +22,7 @@ That is the whole idea. What makes it usable in practice is the other half: the 
 
 ## Install
 
-Requires Node 18.17 or later, Git and npm. Run these commands in your app's directory.
+For browser checks with the current Playwright release, use Node 20 or later, Git and npm. The browser-free `verify` command also supports Node 18.17 or later. Run these commands in your app's directory.
 
 As of 5 October 2026, `deep-smoke` is not published on the public npm registry. Install it from the public GitHub repository instead:
 

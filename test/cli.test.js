@@ -17,16 +17,6 @@ const BIN = fileURLToPath(new URL('../bin/deep-smoke.js', import.meta.url));
 let workspace;
 let installedBin;
 
-before(() => {
-  workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-cli-'));
-  installedBin = path.join(workspace, 'deep-smoke');
-  fs.symlinkSync(BIN, installedBin, 'file');
-});
-
-after(() => {
-  fs.rmSync(workspace, { recursive: true, force: true });
-});
-
 /**
  * Runs the binary and returns its output and exit code, never throwing.
  *
@@ -129,6 +119,16 @@ describe('helpText', () => {
 });
 
 describe('command line', () => {
+  before(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-cli-'));
+    installedBin = path.join(workspace, 'deep-smoke');
+    fs.symlinkSync(BIN, installedBin, 'file');
+  });
+
+  after(() => {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  });
+
   it('prints help when invoked through an installed binary symlink', async () => {
     const { code, stdout } = await cli(['--help'], workspace, installedBin);
     assert.equal(code, 0);

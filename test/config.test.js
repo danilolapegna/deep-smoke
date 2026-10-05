@@ -9,14 +9,6 @@ import { DEFAULT_CONFIG, loadConfig, normaliseBaseUrl, compilePatterns, severity
 
 let workspace;
 
-before(() => {
-  workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-config-'));
-});
-
-after(() => {
-  fs.rmSync(workspace, { recursive: true, force: true });
-});
-
 /**
  * Writes a config file into the scratch workspace.
  *
@@ -46,6 +38,14 @@ describe('normaliseBaseUrl', () => {
 });
 
 describe('loadConfig', () => {
+  before(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-config-'));
+  });
+
+  after(() => {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  });
+
   it('returns the defaults when there is no config file', () => {
     const { config, configPath } = loadConfig({ cwd: workspace });
     assert.equal(configPath, null);

@@ -10,15 +10,15 @@ import { contextOptionsFor, resolveSecret, validateAuthConfig } from '../src/aut
 
 let workspace;
 
-before(() => {
-  workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-personas-'));
-});
-
-after(() => {
-  fs.rmSync(workspace, { recursive: true, force: true });
-});
-
 describe('loadPersonas', () => {
+  before(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-personas-'));
+  });
+
+  after(() => {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  });
+
   it('defaults to a single anonymous visitor', () => {
     const empty = fs.mkdtempSync(path.join(workspace, 'empty-'));
     const { personas, sourcePath } = loadPersonas({ baseDir: empty });
@@ -132,6 +132,14 @@ describe('resolveSecret', () => {
 });
 
 describe('contextOptionsFor', () => {
+  before(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-personas-'));
+  });
+
+  after(() => {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  });
+
   it('returns nothing for strategies that do not need context options', () => {
     assert.deepEqual(contextOptionsFor({ strategy: 'none' }, workspace), {});
     assert.deepEqual(contextOptionsFor({ strategy: 'form' }, workspace), {});
