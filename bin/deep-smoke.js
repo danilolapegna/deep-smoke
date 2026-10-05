@@ -15,7 +15,8 @@
 
 import path from 'node:path';
 import process from 'node:process';
-import { pathToFileURL } from 'node:url';
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import {
   ConfigError,
   EXIT_CODES,
@@ -350,7 +351,7 @@ export async function main(argv) {
   }
 }
 
-// Only run when invoked as a program, so the module can be imported by tests.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// npm's installed binary is a symlink. Compare real paths while keeping imports inert.
+if (process.argv[1] && realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1])) {
   process.exitCode = await main(process.argv.slice(2));
 }

@@ -22,20 +22,32 @@ That is the whole idea. What makes it usable in practice is the other half: the 
 
 ## Install
 
+Requires Node 18.17 or later, Git and npm. Run these commands in your app's directory.
+
+As of 5 October 2026, `deep-smoke` is not published on the public npm registry. Install it from the public GitHub repository instead:
+
 ```bash
-npm install --save-dev deep-smoke playwright
+npm install --save-dev --ignore-scripts "git+https://github.com/danilolapegna/deep-smoke.git#main" playwright
 npx playwright install chromium
 ```
 
-Playwright is a peer dependency, declared optional. It is large, many projects already have it, and the `verify` subcommand needs neither it nor a browser, so a pre-push hook or a pipeline stage can check evidence on a machine that cannot run browsers at all. If it is missing when you try to crawl, deep-smoke says so and prints the two commands above.
+For a reproducible installation, replace `main` with the full commit SHA you have reviewed. Keep the generated lockfile: it records the Git revision and dependency versions. Installing adds development dependencies and updates your manifest and lockfile. It does not start a crawl or edit your application code. Chromium is a separate browser download, used locally for the checks.
 
-Requires Node 18.17 or later.
+Check that the installed command actually runs:
+
+```bash
+npx --no-install deep-smoke --version
+```
+
+It should print `0.1.0`. An empty response is not a successful check. Stop if installation fails or the command prints nothing.
+
+Playwright is a peer dependency, declared optional. It is large, many projects already have it, and the `verify` subcommand needs neither it nor a browser, so a pre-push hook or a pipeline stage can check evidence on a machine that cannot run browsers at all. If it is missing when you try to crawl, deep-smoke prints the commands to install Playwright and Chromium.
 
 ---
 
 ## 60-second quick start
 
-Start your app, then point deep-smoke at it:
+Start your app, then point deep-smoke at it. The example below uses `npm run dev` and port `5173`; use your app's start command and URL if they differ:
 
 ```bash
 npm run dev &
@@ -53,7 +65,7 @@ Level 3 discovers routes by following links, so how much it finds depends on how
 ```jsonc
 // deep-smoke.config.json
 {
-  "baseUrl": "http://localhost:4173",
+  "baseUrl": "http://localhost:5173",
   "routes": ["/", "/pricing", "/sign-in", "/app", "/app/settings"],
   "protectedPrefixes": ["/app"],
   "publicRoutes": ["/", "/pricing"]
@@ -63,6 +75,8 @@ Level 3 discovers routes by following links, so how much it finds depends on how
 Now `npx deep-smoke --level=3` crawls those seeds, everything they link to, and checks that `/app` bounces a signed-out visitor. Add personas and it crawls the signed-in half of the app too.
 
 Complete examples, including four ways to authenticate, are in [`examples/`](examples/).
+
+For a small example you can build and break yourself, see [A passing smoke test can still miss your broken page](https://dev.to/danilolapegna/a-passing-smoke-test-can-still-miss-your-broken-page-5332). It shows the same site passing with an incomplete route list and failing once the missing orders page is included.
 
 ---
 
