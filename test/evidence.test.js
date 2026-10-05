@@ -18,14 +18,6 @@ import {
 
 let workspace;
 
-before(() => {
-  workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-evidence-'));
-});
-
-after(() => {
-  fs.rmSync(workspace, { recursive: true, force: true });
-});
-
 /**
  * Builds a run result shaped like the crawler's output, without a browser.
  *
@@ -127,6 +119,14 @@ describe('buildEvidence', () => {
 });
 
 describe('evidence files', () => {
+  before(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-evidence-'));
+  });
+
+  after(() => {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  });
+
   it('names a file after its level and commit', () => {
     const evidence = buildEvidence(runResult(), {
       vcs: { kind: 'git', commit: 'abcdef0123456789abcdef0123456789abcdef01', branch: 'main', dirty: false },

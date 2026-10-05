@@ -15,14 +15,7 @@ const run = promisify(execFile);
 const BIN = fileURLToPath(new URL('../bin/deep-smoke.js', import.meta.url));
 
 let workspace;
-
-before(() => {
-  workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-cli-'));
-});
-
-after(() => {
-  fs.rmSync(workspace, { recursive: true, force: true });
-});
+let installedBin;
 
 /**
  * Runs the binary and returns its output and exit code, never throwing.
@@ -31,9 +24,9 @@ after(() => {
  * @param {string} [cwd] Working directory.
  * @returns {Promise<{code: number, stdout: string, stderr: string}>} Result.
  */
-async function cli(args, cwd = workspace) {
+async function cli(args, cwd = workspace, binary = BIN) {
   try {
-    const { stdout, stderr } = await run(process.execPath, [BIN, ...args], { cwd, env: { ...process.env, NO_COLOR: '1' } });
+    const { stdout, stderr } = await run(process.execPath, [binary, ...args], { cwd, env: { ...process.env, NO_COLOR: '1' } });
     return { code: 0, stdout, stderr };
   } catch (error) {
     return { code: error.code ?? 1, stdout: error.stdout ?? '', stderr: error.stderr ?? '' };
@@ -126,6 +119,35 @@ describe('helpText', () => {
 });
 
 describe('command line', () => {
+  before(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-cli-'));
+    installedBin = path.join(workspace, 'deep-smoke');
+    fs.symlinkSync(BIN, installedBin, 'file');
+  });
+
+  after(() => {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  });
+
+  it('prints help when invoked through an installed binary symlink', async () => {
+    const { code, stdout } = await cli(['--help'], workspace, installedBin);
+    assert.equal(code, 0);
+    assert.match(stdout, /USAGE/);
+  });
+
+  it('rejects an invalid option through an installed binary symlink', async () => {
+    const { code, stderr } = await cli(['--nope'], workspace, installedBin);
+    assert.equal(code, 2);
+    assert.match(stderr, /Unknown option: --nope/);
+  });
+
+  it('fails verification without evidence through an installed binary symlink', async () => {
+    const dir = fs.mkdtempSync(path.join(workspace, 'installed-'));
+    const { code, stderr } = await cli(['verify', '--level=1'], dir, installedBin);
+    assert.equal(code, 1);
+    assert.match(stderr, /No evidence files found/);
+  });
+
   it('prints help and exits cleanly', async () => {
     const { code, stdout } = await cli(['--help']);
     assert.equal(code, 0);

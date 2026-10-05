@@ -14,14 +14,6 @@ const OTHER = 'c'.repeat(40);
 
 let workspace;
 
-before(() => {
-  workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-verify-'));
-});
-
-after(() => {
-  fs.rmSync(workspace, { recursive: true, force: true });
-});
-
 /**
  * A scripted git repository, so freshness can be tested against a known history
  * instead of against whatever the working copy happens to contain.
@@ -264,6 +256,14 @@ describe('assessEvidence', () => {
 });
 
 describe('verifyEvidence', () => {
+  before(() => {
+    workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-smoke-verify-'));
+  });
+
+  after(() => {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  });
+
   it('reports why every candidate was rejected, not just that none passed', () => {
     const dir = fs.mkdtempSync(path.join(workspace, 'repo-'));
     writeEvidence(evidenceAt({ commit: null, level: 1 }), { dir: '.deep-smoke', cwd: dir });

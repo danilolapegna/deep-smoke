@@ -27,15 +27,6 @@ const FIXTURE_DIR = fileURLToPath(new URL('./fixtures', import.meta.url));
 let server;
 let browser;
 
-before(async () => {
-  browser = await browserAvailability();
-  if (browser.available) server = await startStaticServer(SITE);
-});
-
-after(async () => {
-  if (server) await server.close();
-});
-
 /**
  * Runs a crawl against the fixture site.
  *
@@ -83,6 +74,15 @@ function checksFor(evidence, route) {
 }
 
 describe('crawling a real site', () => {
+  before(async () => {
+    browser = await browserAvailability();
+    if (browser.available) server = await startStaticServer(SITE);
+  });
+
+  after(async () => {
+    if (server) await server.close();
+  });
+
   it('walks the reachable routes and passes on a healthy site', async (t) => {
     if (!browser.available) return t.skip(browser.reason);
 
